@@ -30,16 +30,24 @@ double compute_pi(size_t dt)
 }
 
 int main(void) {
-    FILE *fPtr;
-    fPtr = fopen("avx_simd.txt", "w+");
+    double time_elapsed[DT_SIZE];
     int ds;
     double start, finish;
+    
     for (ds = 1; ds <= DT_SIZE; ds++) {
         start = clock();
         compute_pi(ds*1000000);
         finish = clock();
-        fprintf(fPtr, "%d\t%lf\n", ds, (double)(finish-start)/CLOCKS_PER_SEC);
-        fflush(fPtr);
+        time_elapsed[ds] = (double)(finish-start)/CLOCKS_PER_SEC;
     }
+    
+    FILE *fp;
+    fp = fopen("avx_simd.txt", "w+");
+    int i;
+    fprintf(fp, "#delta_size\ttime\n");
+    for (i = 0; i < DT_SIZE; i++) {
+        fprintf(fp, "%d\t%lf\n", i, time_elapsed[i]);
+    }
+    fclose(fp);
     return 0;
 }

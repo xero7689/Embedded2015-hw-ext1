@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -mavx -std=c99
+OPTIMIZE_FLAGS= -O0
+CFLAGS = -mavx -std=c99 $(OPTIMIZE_FLAGS)
 
 all: avx_simd baseline
 
