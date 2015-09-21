@@ -2,19 +2,33 @@ CC = gcc
 OPTIMIZE_FLAGS= -O0
 CFLAGS = -mavx -std=c99 $(OPTIMIZE_FLAGS)
 
-all: avx_simd baseline
+all: avx_simd avx_simd_pthread baseline baseline_pthread
 
 avx_simd: avx_simd.o
 	$(CC) -o avx_simd avx_simd.o
 
+avx_simd_pthread: avx_simd_pthread.o
+	$(CC) -pthread -o avx_simd_pthread avx_simd_pthread.o
+
 baseline: baseline.o
 	$(CC) -o baseline baseline.o
 
+baseline_pthread: baseline_pthread.o
+	$(CC) -pthread -o baseline_pthread baseline_pthread.o
+
+
 avx_simd.o: avx_simd.c
-	$(CC) $(CFLAGS) avx_simd.c -c
+	$(CC) $(CFLAGS) -pthread avx_simd.c -c
+
+avx_simd_pthread.o: avx_simd_pthread.c
+	$(CC) $(CFLAGS) avx_simd_pthread.c -c
 
 baseline.o: baseline.c
 	$(CC) $(CFLAGS) baseline.c -c
 
+baseline_pthread.o: baseline_pthread.c
+	$(CC) $(CFLAGS) baseline_pthread.c -c
+
+
 clean:
-	rm -rf avx_simd.o baseline.o
+	rm -rf avx_simd.o avx_simd_pthread.o baseline.o baseline_pthread.o
