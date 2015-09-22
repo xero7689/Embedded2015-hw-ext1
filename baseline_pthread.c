@@ -7,6 +7,7 @@
 #define THREAD_NUM 4
 
 double pi = 0.0;
+pthread_barrier_t barrier;
 
 typedef struct thread_argument {
     double delta;
@@ -28,9 +29,10 @@ void* compute_pi_pthread(void *argument)
         tmp_pi += delta / (1.0 + x * x);
     }
     pi += 4 * tmp_pi;
+    pthread_barrier_wait(&barrier);
 }
 
-double compute_pi_re(size_t dt)
+void compute_pi(size_t dt)
 {
     // Init Pthread
     pthread_t thread[THREAD_NUM];  // array of thread
@@ -46,8 +48,11 @@ double compute_pi_re(size_t dt)
         ta[i].start_index = i * block_size;
         ta[i].end_index = i * block_size + block_size - 1;
         pthread_create(&thread[i], NULL, &compute_pi_pthread, (void *)&ta[i]);
+    }
+    for (int i = 0; i < THREAD_NUM; i++) {
         pthread_join(thread[i], NULL);
     }
+    //printf("pi=%lf\n", pi);
 }
 
 int main(void)
@@ -56,10 +61,11 @@ int main(void)
     int ds;
     double pi;
     double start, finish;
+    pthread_barrier_init(&barrier, NULL, (unsigned) THREAD_NUM);
     
     for (ds = 0; ds < DT_SIZE; ds++) {
         start = clock();
-        pi = compute_pi_re(ds*1000000);
+        compute_pi(ds*1000000);
         finish = clock();
         time_elapsed[ds] = (double)(finish-start)/CLOCKS_PER_SEC;
         pi = 0.0;

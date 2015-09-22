@@ -29,7 +29,7 @@ double compute_pi(size_t dt)
     return pi * 4.0;
 }
 
-int main(void) {
+int __attribute__((optimize("O0"))) main(void) {
     double time_elapsed[DT_SIZE];
     int ds;
     double start, finish;
